@@ -94,22 +94,29 @@ namespace Orleans.TelemetryConsumers.ElasticSearch.Serializer
 
         public object Deserialize(Type type, Stream stream)
         {
-            throw new NotImplementedException();
-        }
+			var settings = this._settings;
+			return _Deserialize<object>(stream, settings);
+		}
 
         public Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
-        }
+			return (Task<object>)this.Deserialize<object>(stream);
+		}
 
         public void Serialize<T>(T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.None)
         {
-            throw new NotImplementedException();
-        }
+			using (var writer = new StreamWriter(stream, ExpectedEncoding, BufferSize, leaveOpen: true))
+			using (var jsonWriter = new JsonTextWriter(writer))
+			{
+				_defaultSerializer.Serialize(jsonWriter, data);
+				writer.Flush();
+				jsonWriter.Flush();
+			}
+		}
 
         public Task SerializeAsync<T>(T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.None, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
-        }
+			return Task.Run(() => this.Serialize<object>(data, stream, formatting));
+		}
     }
 }

@@ -358,14 +358,15 @@ namespace Orleans.Telemetry
 		{
 			if (jos.Count() < 1)
 				return;
-
 			var actionMeta = jos.Select(o => new { index = new { _index = o.IndexName, _type = o.IndexType } });
 			var actionMetaSource = jos.Zip(actionMeta, (f, s) => new object[] { s, f.tm });
 			var bbo = actionMetaSource.SelectMany(a => a);
-			PostData pd = PostData.Serializable(bbo);
-			BulkRequestParameters br = new BulkRequestParameters();
-			br.Refresh = Refresh.False;
-			try
+			PostData pd = PostData.MultiJson(bbo);
+            BulkRequestParameters br = new BulkRequestParameters
+            {
+                Refresh = Refresh.False
+            };
+            try
 			{
 				var ret = await GetClient(this._elasticSearchUri)
 					.BulkAsync<VoidResponse>(pd, br);
