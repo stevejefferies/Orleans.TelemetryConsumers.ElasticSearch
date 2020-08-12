@@ -65,8 +65,7 @@ namespace Orleans.Telemetry
 			{
 				var singleNode = new SingleNodeConnectionPool(esurl);
 
-				var cc = new ConnectionConfiguration(singleNode,
-						connectionSettings => new ElasticsearchJsonNetSerializer())
+				var cc = new ConnectionConfiguration(singleNode, new ElasticsearchJsonNetSerializer())
 					.EnableHttpPipelining()
 					.ThrowExceptions();
 
@@ -363,13 +362,13 @@ namespace Orleans.Telemetry
 			var actionMeta = jos.Select(o => new { index = new { _index = o.IndexName, _type = o.IndexType } });
 			var actionMetaSource = jos.Zip(actionMeta, (f, s) => new object[] { s, f.tm });
 			var bbo = actionMetaSource.SelectMany(a => a);
-
+			PostData pd = PostData.Serializable(bbo);
+			BulkRequestParameters br = new BulkRequestParameters();
+			br.Refresh = Refresh.False;
 			try
 			{
 				var ret = await GetClient(this._elasticSearchUri)
-					.BulkPutAsync<VoidResponse>(
-				        bbo.ToArray(), 
-				        br => br.Refresh(false));
+					.BulkAsync<VoidResponse>(pd, br);
 			}
 			catch (Exception ex)
 			{

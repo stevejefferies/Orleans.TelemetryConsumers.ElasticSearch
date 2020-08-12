@@ -92,6 +92,24 @@ namespace Orleans.TelemetryConsumers.ElasticSearch.Serializer
 			}
 		}
 
-		public IPropertyMapping CreatePropertyMapping(MemberInfo memberInfo) => null;
-	}
+        public object Deserialize(Type type, Stream stream)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<object> DeserializeAsync(Type type, Stream stream, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Serialize<T>(T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.None)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SerializeAsync<T>(T data, Stream stream, SerializationFormatting formatting = SerializationFormatting.None, CancellationToken cancellationToken = default)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
